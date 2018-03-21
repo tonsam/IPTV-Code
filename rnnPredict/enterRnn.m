@@ -4,8 +4,8 @@ function enterRnn
 %%%%%%%%
 
 %%%%%%%%%%¿Éµ÷²ÎÊı%%%%%%%%%%
-rnnpara.channeltype = 1; %ÑµÁ·ÆµµÀÀàĞÍ£¬1.Àä 2.ÈÈ
-rnnpara.channelFreqPercent = 4; %ÆµµÀ»®·ÖÆµÂÊ°Ù·Ö±È
+rnnpara.channeltype = 2; %ÑµÁ·ÆµµÀÀàĞÍ£¬0,²»Çø·Ö£¬1.Àä 2.ÈÈ
+rnnpara.channelFreqPercent = 4.5; %ÆµµÀ»®·ÖÆµÂÊ°Ù·Ö±È
 rnnpara.windows= 7;    %Ñ¡ÔñµÄÑµÁ·´°¿Ú
 rnnpara.startday = 1;   %µÚÒ»¸öÑµÁ·´°¿ÚÆğÊ¼ÈÕÆÚ£¬µÚÒ»´ÎÑµÁ·Îª1~windowºÅ£¬window+1ºÅ×÷ÎªµÚÒ»´Î²âÊÔÈÕÆÚ
 rnnpara.endday = 31 - rnnpara.windows;   %×îºóÒ»¸öÑµÁ·´°¿ÚÆğÊ¼ÈÕÆÚ£¬w=7£¬ÔòÎª24£¬31ºÅ×÷Îª×îºóÒ»´Î²âÊÔÈÕÆÚ
@@ -22,11 +22,10 @@ outputDir = 'C:\Work\IPTV\IPTV Recommendation\Result\'; %ÍÆ¼öÂÊ½á¹û±£´æËùÔÚÎÄ¼ş¼
 fileList=dir(fullfile(inputDir));
 fileNum = length(fileList);
 
-
 for channeltype = 1:2
-    rnnpara.channeltype = channeltype;
-    for fp = 2:0.5:6
-        rnnpara.channelFreqPercent = fp; 
+     rnnpara.channeltype = channeltype;
+     for fp = 2:0.5:8.5
+     rnnpara.channelFreqPercent = fp; 
         %±éÀú¸Ã×éÊı¾İ¼¯ÀïµÄËùÓĞÎÄ¼ş
         for  i = 3:fileNum
             inputFile = fullfile(inputDir,fileList(i,1).name);
@@ -44,11 +43,17 @@ for channeltype = 1:2
                 disp(['ÔËĞĞÊ±¼ä£º',time5]);
 
                 [~,name,~]=fileparts(inputFile);
+%                 if rnnpara.channeltype == 0 
+%                     name = strcat(name,'ChannelType',num2str(rnnpara.channeltype),'Result.mat');
+%                 else
+%                     name = strcat(name,'ChannelType',num2str(rnnpara.channeltype),'by',num2str(rnnpara.channelFreqPercent),'%Result.mat');
+%                 end
                 name = strcat(name,'ChannelType',num2str(rnnpara.channeltype),'by',num2str(rnnpara.channelFreqPercent),'%Result.mat');
+             
                 outputFile=fullfile(outputDir,name);
                 save(outputFile,'recomm5');
                 save(outputFile,'time5','-append');
             end 
         end
-    end
-end
+     end
+ end

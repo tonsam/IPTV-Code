@@ -5,17 +5,19 @@ function [ opts ] = PrepareData_Char_RNN( opts )
 opts.valid = 0;  %数据准备未完成，设置训练为无效，见最后一行
 %%%%%%%%%%%%%%%%%%%%%%%训练集预处理部分%%%%%%%%%%%%%%%%%%%%%%%%
 %-------取出用户训练窗口内的数据---------
-dataset = opts.dataset(find(opts.dataset(:,4:4)>=opts.start&opts.dataset(:,4:4)<=opts.endtrain),:);
+dataset = opts.dataset(find(opts.dataset(:,4:4)>=opts.starttrain&opts.dataset(:,4:4)<=opts.endtrain),:);
 dataset = dataset(:,2:2); %只取当前频道一列
 %-----数据集小于序列长度，结束准备-------
 if(size(dataset,1)==1||size(dataset,1)<opts.parameters.n_frames)
     return;
 end
 %--------按频率对频道进行冷热划分--------
-[ColdChannelList,HotChannelList] = ChannelPartition_rnn(dataset,opts.channelFreqPercent);
-if opts.channeltype == 1
+[ColdChannelList,HotChannelList,AllChannelList] = ChannelPartition_rnn(dataset,opts.channelFreqPercent);
+if opts.channeltype == 0
+    channelList = AllChannelList;
+elseif opts.channeltype == 1
     channelList = ColdChannelList;
-else
+elseif opts.channeltype == 2
     channelList = HotChannelList;
 end
 %--------获取目标频道对应训练集----------
@@ -46,7 +48,8 @@ if(size(dataset,1)==1||size(dataset,1)<opts.parameters.n_frames)
     return ;
 end
 %--获取目标频道对应测试集并进行频道映射--
-dataset = getChannelRecord_rnn(dataset,channelList);
+ dataset = getChannelRecord_rnn(dataset,channelList);
+%dataset = getChannelRecord_rnn(dataset,ColdChannelList);
 dataset = mapChannelForRnn(dataset,channelHash);
 %--------按照序列长度重构训练集----------
 x = SerializeDataset(dataset,opts.seqlength);

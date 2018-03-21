@@ -14,25 +14,25 @@ opts.network_name = rnnpara.network_name;
 opts.seqlength = rnnpara.seqlength;
 opts.parameters.batch_size = rnnpara.batch_size;
 opts.parameters.n_hidden_nodes = rnnpara.n_hidden_nodes;
-opts.parameters.n_cell_nodes=rnnpara.n_hidden_nodes; %？
-opts.usedataset = load(inputFile);%加载训练数据文件（.txt）
+opts.parameters.n_cell_nodes=rnnpara.n_hidden_nodes; 
+opts.inputfiledata = load(inputFile);%加载训练数据文件（.txt）
 
 del = [];%记录存在404（训练数据不足）结果的设备
 %h = waitbar(0,'算，等！');
 %枚举所有用户，deviceitr表示当前用户编号 最多3000
-for deviceitr = 1:100  
+for deviceitr = 1:100
     %waitbar((3000-deviceitr)/3000);
     fprintf('当前训练用户编号为%d\n',deviceitr)
     %取出该当前用户这个月的所有记录
     opts.current_device = deviceitr;
-    opts.dataset = opts.usedataset(find(opts.usedataset(:,1:1)==opts.current_device),:);
+    opts.dataset = opts.inputfiledata(find(opts.inputfiledata(:,1:1)==opts.current_device),:);
     
     %枚举训练窗口起始日期，滑动窗口开始，Main_Char_RNN为进入rnn的函数
     for dayitr = rnnpara.startday:rnnpara.endday   
         %训练窗口[opts.start,opts.endtrain-1]
-        opts.start =dayitr;   
-        opts.endtrain = opts.start+rnnpara.windows-1;
-        opts.testtrain = opts.start+rnnpara.windows;
+        opts.starttrain =dayitr;   
+        opts.endtrain = opts.starttrain+rnnpara.windows-1;
+        opts.testtrain = opts.starttrain+rnnpara.windows;
 
         opts = Main_Char_RNN(opts); %训练并返回训练结果
         

@@ -47,7 +47,7 @@ opts.use_gpu=0; %use gpu or not
 opts.use_cudnn=0;
 opts.valid = 1;%标记数据集是否符合训练要求（序列长度、batch_size等要求），初始话为1
 opts.plot=1;%%画图
-opts.dataDir=['./',opts.dataset_name,'/'];
+%opts.dataDir=['./',opts.dataset_name,'/']; %网络模型状态、网络模型结果存放目录（）
 
 % opts.parameters.batch_size=5;
 % opts.parameters.n_hidden_nodes=30;
@@ -114,10 +114,8 @@ opts.n_test_batch=floor(opts.n_test/opts.parameters.test_batch_size);%所有数据测
 opts.parameters.current_ep=1;     %start_ep=opts.parameters.current_ep;
 %开始进行N次epoch训练
 for ep=1:opts.n_epoch
-    opts.parameters.current_ep=opts.parameters.current_ep+1; 
     %%%%%进行一期训练
     [net,opts]=train_rnn(net,opts);  
-    
     %画图
 %     if opts.plot
 %         subplot(1,2,1); plot(opts.results.TrainEpochError);hold on;plot(opts.results.TestEpochError);hold off;title('Error Rate per Epoch')
@@ -127,14 +125,17 @@ for ep=1:opts.n_epoch
     %文件记录每期训练状态及参数
     parameters=opts.parameters;    
     results=opts.results;
-    save(fullfile(opts.output_dir2,[opts.output_name2,num2str(ep),'.mat']),'net','parameters','results');     
+    save(fullfile(opts.output_dir2,[opts.output_name2,num2str(ep),'.mat']),'net','parameters','results');
+    opts.parameters.current_ep=opts.parameters.current_ep+1; 
 end
+%保存最终训练结果copyfile('source','destination')
+copyfile(fullfile(opts.output_dir2,[opts.output_name2,num2str(ep),'.mat']),fullfile(opts.output_dir,opts.output_name));
 %%%%%测试模型
 [opts]=test_rnn(net,opts);
 %输出测试结果及文件记录最后一期训练结果
 disp(['Epoch ',num2str(ep),' testing error: ',num2str(opts.results.TestEpochError(end)), ' testing loss: ',num2str(opts.results.TestEpochLoss(end))])
 disp(['Epoch ',num2str(ep),'last testing error: ',num2str(opts.results.LastTestEpochError(end))])
-copyfile(fullfile(opts.output_dir2,[opts.output_name2,num2str(ep),'.mat']),fullfile(opts.output_dir,opts.output_name));
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %training goes above
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

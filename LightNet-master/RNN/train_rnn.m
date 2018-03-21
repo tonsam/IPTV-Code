@@ -15,7 +15,7 @@ function [net,opts]=train_rnn(net,opts)
     
     tic
     
-    opts.order=randperm(opts.n_train); %返回一行包含从1到n的整数。
+    opts.order=randperm(opts.n_train); %不重复的重排采样[1,n_train]。
     for mini_b=1:opts.n_batch
         
         idx=opts.order(1+(mini_b-1)*opts.parameters.batch_size:mini_b*opts.parameters.batch_size);

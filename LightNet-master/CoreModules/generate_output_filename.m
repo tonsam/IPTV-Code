@@ -22,11 +22,18 @@ function [ opts ] = generate_output_filename( opts )
         opts.output_name=[opts.output_name,'-asgd_lr-',num2str(opts.parameters.asgd_lr),'-reset-',num2str(opts.parameters.asgd_reset_freq)];
     end
 
-    
+    %每一期训练临时保存网络模型训练结果及参数
     opts.output_name2=[opts.output_name,'-epoch-'];
     opts.output_dir2=['./',opts.dataset_name,'-tests/temp/'];
-
-    opts.output_name=[opts.output_name,'-epoch-',num2str(opts.n_epoch),'.mat'];    
+    %保存最终训练结果目录
+    opts.output_name=[opts.output_name,'-epoch-',num2str(opts.n_epoch),'.mat']; 
+    %频道类型区分
+%     if opts.channeltype == 0 
+%          opts.output_name=[opts.output_name,'-epoch-',num2str(opts.n_epoch),'-ChannelType-',num2str(opts.channeltype),'.mat'];
+%     else
+%         opts.output_name=[opts.output_name,'-epoch-',num2str(opts.n_epoch),'-ChannelType-',num2str(opts.channeltype),'-by-',num2str(opts.channelFreqPercent),'%.mat'];
+%     end
+    
     opts.output_dir=['./',opts.dataset_name,'-tests/'];
     
     if ~exist(opts.output_dir,'dir')
