@@ -1,10 +1,10 @@
-function [ FinalPrecision ,anss  ] = FinalPrecision(hotchannelresultPath,coldchannelresultPath,channelFreqPercent,inputFile)
+function [ anss ] = FinalPrecision(hotchannelresultPath,coldchannelresultPath,channelFreqPercent,inputFile)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %需要选取rt矩阵
 temp = load(hotchannelresultPath);
-rnnpara.hotResult = temp.recomm5.rt1 ;
+rnnpara.hotResult = temp.recomm5.rt5 ;
 temp = load(coldchannelresultPath);
-rnnpara.coldResult = temp.recomm5.rt1;
+rnnpara.coldResult = temp.recomm5.rt5;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 rnnpara.channelFP = channelFreqPercent; %频道划分频率百分比
 rnnpara.windows= 7;    %选择的训练窗口
@@ -21,18 +21,21 @@ for useritr = 1:userN
     FinalPrecision(useritr,:) = FinalPrecision(useritr,:) + getUserFP(rnnpara,useritr);
 end
 anssum = 0;
+temp  = 0;
 for useritr = 1:userN
     sum = 0;
-    i = 1;
+    i = 0;
     for day = rnnpara.startday:rnnpara.endday
         if FinalPrecision(useritr,day) ~= 404
             sum = sum + FinalPrecision(useritr,day);
             i =i+1;
         end
     end
-    anssum = anssum + sum /i;
-    
+    if i>0
+        anssum = anssum + sum /i;
+        temp =temp+1;
+    end
 end
-anss = anssum / userN;
+anss = anssum / temp;
 end
 

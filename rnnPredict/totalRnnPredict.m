@@ -20,7 +20,7 @@ opts.inputfiledata = load(inputFile);%加载训练数据文件（.txt）
 del = [];%记录存在404（训练数据不足）结果的设备
 %h = waitbar(0,'算，等！');
 %枚举所有用户，deviceitr表示当前用户编号 最多3000
-for deviceitr = 1:100
+for deviceitr = 1:1
     %waitbar((3000-deviceitr)/3000);
     fprintf('当前训练用户编号为%d\n',deviceitr)
     %取出该当前用户这个月的所有记录

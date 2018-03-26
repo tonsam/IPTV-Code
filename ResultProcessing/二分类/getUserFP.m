@@ -14,10 +14,10 @@ function [ UserFP ] = getUserFP( rnnpara,useritr )
             %-----取出测试当天数据计算冷、热频道推荐次数-------
             dataset = rnnpara.dataset(find(rnnpara.dataset(:,4:4)==day+rnnpara.windows),:);
             dataset = dataset(:,2:2);
-            Colddataset = getChannelRecord_rnn(dataset,ColdChannelList) - rnnpara.seqlength + 1;
-            Hotdataset = getChannelRecord_rnn(dataset,HotChannelList) - rnnpara.seqlength + 1;
+            Colddataset = size(getChannelRecord_rnn(dataset,ColdChannelList),1) - rnnpara.seqlength + 1;
+            Hotdataset = size(getChannelRecord_rnn(dataset,HotChannelList),1) - rnnpara.seqlength + 1;
             %-----计算冷、热频道推荐次数占比及加权查全率-------
-            hotPercent = size(Hotdataset,1) /(size(Hotdataset,1) + size(Colddataset,1));
+            hotPercent = Hotdataset/(Hotdataset + Colddataset);
             coldPercent = 1 - hotPercent;
             UserFP = [UserFP,double(hotResult(day)*hotPercent+coldResult(day)*coldPercent)];
         end

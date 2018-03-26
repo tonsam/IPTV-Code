@@ -22,6 +22,8 @@ elseif opts.channeltype == 2
 end
 %--------获取目标频道对应训练集----------
 dataset = getChannelRecord_rnn(dataset,channelList);
+% %--------只区分冷1、热2频道--------------
+% dataset = myClassify(dataset,ColdChannelList,HotChannelList);
 %---进行频道映射并设置网络I/O节点数------
 channelHash = hashForRnn(dataset);%返回映射表
 dataset = mapChannelForRnn(dataset,channelHash);
@@ -48,7 +50,9 @@ if(size(dataset,1)==1||size(dataset,1)<opts.parameters.n_frames)
     return ;
 end
 %--获取目标频道对应测试集并进行频道映射--
- dataset = getChannelRecord_rnn(dataset,channelList);
+dataset = getChannelRecord_rnn(dataset,channelList);
+%  %--------只区分冷1、热2频道--------------
+% dataset = myClassify(dataset,ColdChannelList,HotChannelList);
 %dataset = getChannelRecord_rnn(dataset,ColdChannelList);
 dataset = mapChannelForRnn(dataset,channelHash);
 %--------按照序列长度重构训练集----------

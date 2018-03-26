@@ -1,10 +1,10 @@
-function [ FinalRecall,anss  ] = FinalRecall(hotchannelresultPath,coldchannelresultPath,channelFreqPercent,inputFile)
+function [ FR,hR,cR  ] = FinalRecall(hotchannelresultPath,coldchannelresultPath,channelFreqPercent,inputFile)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %ĞèÒªÑ¡È¡rt¾ØÕó
 temp = load(hotchannelresultPath);
-rnnpara.hotResult = temp.recomm5.rt5 ;
+rnnpara.hotResult = temp.recomm5.rt4 ;
 temp = load(coldchannelresultPath);
-rnnpara.coldResult = temp.recomm5.rt5;
+rnnpara.coldResult = temp.recomm5.rt4;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 rnnpara.channelFP = channelFreqPercent; %ÆµµÀ»®·ÖÆµÂÊ°Ù·Ö±È
 rnnpara.windows= 7;    %Ñ¡ÔñµÄÑµÁ·´°¿Ú
@@ -15,22 +15,35 @@ rnnpara.inputfiledata = load(inputFile);  %ÑµÁ·Ê±×ÜÊäÈëÊı¾İ
 userN = 50; %ĞèÒª¼ÆËãµÄÓÃ»§ÊıÁ¿
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 FinalRecall = zeros(userN,rnnpara.endday); %Ô¤·ÖÅäÄÚ´æ
+hotR = zeros(userN,rnnpara.endday); %Ô¤·ÖÅäÄÚ´æ
+coldR = zeros(userN,rnnpara.endday); %Ô¤·ÖÅäÄÚ´æ
 fprintf('µ±Ç°ÎÄ¼şÎªÆµÂÊÎª%fµÄÄÇ¸ö...\n',channelFreqPercent);
 for useritr = 1:userN
     rnnpara.dataset = rnnpara.inputfiledata(find(rnnpara.inputfiledata(:,1:1)==useritr),:);
-    FinalRecall(useritr,:) = FinalRecall(useritr,:) + getUserFR(rnnpara,useritr);
+    [tempFR,temphotR,tempcoldR] = getUserFR(rnnpara,useritr);
+    FinalRecall(useritr,:) = FinalRecall(useritr,:) + tempFR;
+    hotR(useritr,:) = hotR(useritr,:) + temphotR;
+    coldR(useritr,:) = coldR(useritr,:) + tempcoldR;
 end
+FR = getMean(FinalRecall,rnnpara,userN);
+hR = getMean(hotR,rnnpara,userN);
+cR = getMean(coldR,rnnpara,userN);
+
+end
+
+
+function [anss] = getMean(tempR,rnnpara,userN)
 anssum = 0;
 for useritr = 1:userN
     sum = 0;
-    i = 1;
+    i = 0;
     for day = rnnpara.startday:rnnpara.endday
-        sum = sum + FinalRecall(useritr,day);
+        sum = sum + tempR(useritr,day);
         i =i+1;
     end
-    anssum = anssum + sum /i;
-    
+    if i>0
+        anssum = anssum + sum /i;
+    end
 end
 anss = anssum /userN;
 end
-
