@@ -130,6 +130,7 @@ for ep=1:opts.n_epoch
 end
 %保存最终训练结果copyfile('source','destination')
 copyfile(fullfile(opts.output_dir2,[opts.output_name2,num2str(ep),'.mat']),fullfile(opts.output_dir,opts.output_name));
+
 %%%%%测试模型
 [opts]=test_rnn(net,opts);
 %输出测试结果及文件记录最后一期训练结果

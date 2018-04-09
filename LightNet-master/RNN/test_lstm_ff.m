@@ -70,8 +70,10 @@ function [ net,res,opts ] = test_lstm_ff( net,opts )
     end
     
     if isfield(opts,'input_labels')
-        %自己加的，计算序列中最后一个结果的预测
-        opts.lasterr = opts.err(:,f)/opts.parameters.test_batch_size;
+        %自己加的，计算序列中对最后一个频道的预测
+        opts.myOutput.lasterr = opts.err(:,f)/opts.parameters.test_batch_size;
+        %自己加的，计算序列中对每个频道的预测
+        opts.myOutput.AllMiniBatchPrediction = [opts.myOutput.AllMiniBatchPrediction,{1-opts.err}];
         
         opts.err=mean(opts.err,2)./opts.parameters.test_batch_size;        
     end

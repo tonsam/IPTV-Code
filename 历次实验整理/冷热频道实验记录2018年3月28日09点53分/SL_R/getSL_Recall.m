@@ -12,7 +12,7 @@ rnnpara.startday = 1;   %第一个训练窗口起始日期，第一次训练为1~window号，window+
 rnnpara.endday = 31 - rnnpara.windows;   %最后一个训练窗口起始日期，w=7，则为24，31号作为最后一次测试日期
 rnnpara.seqlength = 5; %rnn的序列长度
 rnnpara.inputfiledata = load(inputFile);  %训练时总输入数据
-userN = 50; %需要计算的用户数量
+userN = 10; %需要计算的用户数量
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 SLRecall = zeros(userN,rnnpara.endday); %预分配内存
 

@@ -5,12 +5,12 @@ function [opts]=test_rnn(net,opts)
 
     opts.MiniBatchError=[];
     opts.MiniBatchLoss=[];
-    opts.LastMiniBatchError=[];
-    
+    opts.myOutput.LastMiniBatchError=[];
+    opts.myOutput.AllMiniBatchPrediction=[];
  
     
     for mini_b=1:opts.n_test_batch
-        idx=1+(mini_b-1)*opts.parameters.test_batch_size:mini_b*opts.parameters.test_batch_size;
+        idx=1+(mini_b-1)*opts.parameters.test_batch_size:mini_b*opts.parameters.test_batch_size;%选取每个batch对应的记录
         opts.input_data=opts.test(:,idx,:);
         opts.input_labels=opts.test_labels(idx,:);
 
@@ -28,7 +28,7 @@ function [opts]=test_rnn(net,opts)
         if isfield(opts,'err')
             opts.MiniBatchError=[opts.MiniBatchError;gather( opts.err(1))];
             %自己加的，计算序列中最后一个预测的准确率
-            opts.LastMiniBatchError=[opts.LastMiniBatchError,gather( opts.lasterr)];
+            opts.myOutput.LastMiniBatchError=[opts.myOutput.LastMiniBatchError,gather( opts.myOutput.lasterr)];
         end
         opts.MiniBatchLoss=[opts.MiniBatchLoss;gather( opts.loss)];
         
@@ -37,7 +37,7 @@ function [opts]=test_rnn(net,opts)
     
     opts.results.TestEpochError=[opts.results.TestEpochError;mean(opts.MiniBatchError(:))];
     opts.results.TestEpochLoss=[opts.results.TestEpochLoss;mean(opts.MiniBatchLoss(:))];
-    opts.results.LastTestEpochError=[opts.results.LastTestEpochError;mean(opts.LastMiniBatchError,2)];
+    opts.results.LastTestEpochError=[opts.results.LastTestEpochError;mean(opts.myOutput.LastMiniBatchError,2)];
       
 end
 

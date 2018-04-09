@@ -1,5 +1,6 @@
 function [ anss ] = FinalPrecision(hotchannelresultPath,coldchannelresultPath,channelFreqPercent,inputFile)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%获取加权准确率
 %需要选取rt矩阵
 temp = load(hotchannelresultPath);
 rnnpara.hotResult = temp.recomm5.rt5 ;

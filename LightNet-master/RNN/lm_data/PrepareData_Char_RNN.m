@@ -45,12 +45,14 @@ opts.n_train=size(opts.train_labels,1);
 %-------取出第testtrain天测试数据--------
 dataset = opts.dataset(find(opts.dataset(:,4:4)==opts.testtrain),:);
 dataset = dataset(:,2:2);
+%-存放分类后测试样例对应完整测试集的索引-
+opts.myOutput.watchorder = getWatchOrder(dataset,channelList); 
+%--获取目标频道对应测试集并进行频道映射--
+dataset = getChannelRecord_rnn(dataset,channelList);
 %-----数据集小于序列长度，结束准备-------
 if(size(dataset,1)==1||size(dataset,1)<opts.parameters.n_frames)
     return ;
 end
-%--获取目标频道对应测试集并进行频道映射--
-dataset = getChannelRecord_rnn(dataset,channelList);
 %  %--------只区分冷1、热2频道--------------
 % dataset = myClassify(dataset,ColdChannelList,HotChannelList);
 %dataset = getChannelRecord_rnn(dataset,ColdChannelList);

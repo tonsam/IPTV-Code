@@ -1,5 +1,6 @@
 function [ FR,hR,cR  ] = FinalRecall(hotchannelresultPath,coldchannelresultPath,channelFreqPercent,inputFile)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%获取冷、热频道的召回率
 %需要选取rt矩阵
 temp = load(hotchannelresultPath);
 rnnpara.hotResult = temp.recomm5.rt4 ;

@@ -69,8 +69,8 @@ function [ net,res,opts ] = lstm_ff( net,opts )
     end
     
     if isfield(opts,'input_labels')
-        %自己加的，计算序列中最后一个结果的预测
-        opts.lasterr = opts.err(:,f)/opts.parameters.batch_size;
+%         %自己加的，计算序列中最后一个结果的预测
+%         opts.lasterr = opts.err(:,f)/opts.parameters.batch_size;
         
         opts.err=mean(opts.err,2)./opts.parameters.batch_size;        
     end

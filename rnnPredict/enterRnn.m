@@ -21,11 +21,11 @@ inputDir = 'C:\Work\IPTV\IPTV Recommendation\dataset\';%训练集输入所在文件夹
 outputDir = 'C:\Work\IPTV\IPTV Recommendation\Result\'; %推荐率结果保存所在文件夹
 fileList=dir(fullfile(inputDir));
 fileNum = length(fileList);
-
+% 
 % for channeltype = 1:2
 %      rnnpara.channeltype = channeltype;
-%      for fp = 2:0.5:8.5
-%      rnnpara.channelFreqPercent = fp; 
+%       for fp = 2:0.5:8.5
+%       rnnpara.channelFreqPercent = fp; 
 %         %遍历该组数据集里的所有文件
         for  i = 3:fileNum
             inputFile = fullfile(inputDir,fileList(i,1).name);
@@ -35,25 +35,26 @@ fileNum = length(fileList);
                 t1 = clock;%[year month day hour minute seconds]
 
                 %%%%%%%%%%运行%%%%%%%%%%
-                [recomm5,del1] = totalRnnPredict(rnnpara,inputFile);
+                [someOutput,del1] = totalRnnPredict(rnnpara,inputFile);
 
                 %%%%%%%%%%运行结果输出%%%%%%%%%%
-                disp(recomm5);
+                disp(someOutput);
                 time5 = num2str(etime(clock,t1));
                 disp(['运行时间：',time5]);
 
                 [~,name,~]=fileparts(inputFile);
 %                 if rnnpara.channeltype == 0 
-%                     name = strcat(name,'ChannelType',num2str(rnnpara.channeltype),'Result.mat');
+%                     name = strcat(name,'ChannelType',num2str(rnnpara.channeltype),'Result[1001,1010].mat');
 %                 else
 %                     name = strcat(name,'ChannelType',num2str(rnnpara.channeltype),'by',num2str(rnnpara.channelFreqPercent),'%Result.mat');
 %                 end
-                name = strcat(name,'ChannelType',num2str(rnnpara.channeltype),'by',num2str(rnnpara.channelFreqPercent),'%1-2Predict.mat');
+                name = strcat(name,'ChannelType',num2str(rnnpara.channeltype),'by',num2str(rnnpara.channelFreqPercent),'%Recomm.mat');
              
                 outputFile=fullfile(outputDir,name);
-                save(outputFile,'recomm5');
+                save(outputFile,'someOutput');
                 save(outputFile,'time5','-append');
             end 
         end
-%      end
-%  end
+      end
+% end
+% end
