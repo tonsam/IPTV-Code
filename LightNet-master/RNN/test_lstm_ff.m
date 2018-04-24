@@ -12,7 +12,8 @@ function [ net,res,opts ] = test_lstm_ff( net,opts )
         if isfield(opts,'input_labels')
             opts.input_labels=gpuArray(single(opts.input_labels));
             opts.err=zeros(2,n_frames,'like',opts.input_data);
-
+            %自己加的
+            recommchannel=zeros(2,n_frames,'like',opts.input_data);
         end
         if isfield(opts,'input_predicts')
             opts.input_predicts=gpuArray(single(opts.input_predicts));        
@@ -63,14 +64,18 @@ function [ net,res,opts ] = test_lstm_ff( net,opts )
     %%%stats
     for f=1:n_frames
         if isfield(opts,'input_labels')
-            c = error_multiclass(res.Fit{f}(1).class,res.Fit{f});
-            opts.err(:,f)=c;
+            [opts.err(:,f),recommchannel(:,f)] = error_multiclass_test(res.Fit{f}(1).class,res.Fit{f});
         end
         opts.loss(:,f)=mean(res.Fit{f}(end).x(:));     
     end
     
     if isfield(opts,'input_labels')
-        %自己加的，计算序列中对最后一个频道的预测
+        %自己加的，计算序列中对最后一个频道的f(5)个候选频道号
+        for i = 1:f
+           recommchannel(i,f) = opts.channelHashBack(num2str(recommchannel(i,f) ));
+        end 
+        opts.myOutput.lastrecommchannel = recommchannel(:,f);
+        %自己加的，计算序列中对最后一个频道的预测错误与否结果
         opts.myOutput.lasterr = opts.err(:,f)/opts.parameters.test_batch_size;
         %自己加的，计算序列中对每个频道的预测
         opts.myOutput.AllMiniBatchPrediction = [opts.myOutput.AllMiniBatchPrediction,{1-opts.err}];

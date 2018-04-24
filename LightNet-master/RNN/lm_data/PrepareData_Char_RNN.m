@@ -25,9 +25,9 @@ dataset = getChannelRecord_rnn(dataset,channelList);
 % %--------只区分冷1、热2频道--------------
 % dataset = myClassify(dataset,ColdChannelList,HotChannelList);
 %---进行频道映射并设置网络I/O节点数------
-channelHash = hashForRnn(dataset);%返回映射表
+[channelHash,opts.channelHashBack] = hashForRnn(dataset);%返回映射表
 dataset = mapChannelForRnn(dataset,channelHash);
-trainMaxChar = double(channelHash.Count+1);%输入节点数为频道数+1
+trainMaxChar = double(channelHash.Count+1);%网络输入输出节点数为原频道数+1（默认前置频道）
 opts.parameters.n_input_nodes = trainMaxChar;
 opts.parameters.n_output_nodes = trainMaxChar;
 %--------按照序列长度重构训练集----------
@@ -38,13 +38,14 @@ if(size(x,1)<opts.parameters.batch_size)
 end
 %---按照序列长度进行词向量转换训练集格式---
 opts.train =  word2vecforTrain(x,trainMaxChar);
-opts.train_labels=x+1;
+opts.train_labels=x+1;%映射完后，所有频道号加1  %%TODO优化一下逻辑
 opts.n_train=size(opts.train_labels,1);
 
 %%%%%%%%%%%%%%%%%%%%%%%测试集预处理部分%%%%%%%%%%%%%%%%%%%%%%%%
 %-------取出第testtrain天测试数据--------
 dataset = opts.dataset(find(opts.dataset(:,4:4)==opts.testtrain),:);
 dataset = dataset(:,2:2);
+opts.myOutput.datasetorder =dataset;
 %-存放分类后测试样例对应完整测试集的索引-
 opts.myOutput.watchorder = getWatchOrder(dataset,channelList); 
 %--获取目标频道对应测试集并进行频道映射--

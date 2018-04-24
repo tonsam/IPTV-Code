@@ -6,6 +6,7 @@ function [opts]=test_rnn(net,opts)
     opts.MiniBatchError=[];
     opts.MiniBatchLoss=[];
     opts.myOutput.LastMiniBatchError=[];
+    opts.myOutput.LastMiniBatchRecommchannel=[];
     opts.myOutput.AllMiniBatchPrediction=[];
  
     
@@ -27,8 +28,9 @@ function [opts]=test_rnn(net,opts)
        
         if isfield(opts,'err')
             opts.MiniBatchError=[opts.MiniBatchError;gather( opts.err(1))];
-            %自己加的，计算序列中最后一个预测的准确率
+            %自己加的，计算序列中最后一个预测的准确率及候选频道
             opts.myOutput.LastMiniBatchError=[opts.myOutput.LastMiniBatchError,gather( opts.myOutput.lasterr)];
+            opts.myOutput.LastMiniBatchRecommchannel=[opts.myOutput.LastMiniBatchRecommchannel,gather( opts.myOutput.lastrecommchannel)];
         end
         opts.MiniBatchLoss=[opts.MiniBatchLoss;gather( opts.loss)];
         

@@ -1,5 +1,5 @@
 % -------------------------------------------------------------------------
-function err = error_multiclass(labels, res)
+function [err,recommchannel] = error_multiclass(labels, res)
 % -------------------------------------------------------------------------
 predictions = gather(res(end-1).x) ;
 if length(size(predictions))==4

@@ -19,12 +19,12 @@ opts.parameters.n_cell_nodes=rnnpara.n_hidden_nodes;
 opts.inputfiledata = load(inputFile);%加载训练数据文件（.txt）
 
 del = [];%记录存在404（训练数据不足）结果的设备
-%h = waitbar(0,'算，等！');
+h = waitbar(0,'算，等！');
 %枚举所有用户，deviceitr表示当前用户编号 最多3000
 t = 0;
-for deviceitr = 1001:1010
+for deviceitr = rnnpara.UserIDBegin:rnnpara.UserIDEnd
+    waitbar(t/(rnnpara.UserIDEnd-rnnpara.UserIDBegin+1),h,['算，等！已完成：',num2str(t),'/',num2str(rnnpara.UserIDEnd-rnnpara.UserIDBegin+1)]);
     t = t+1;
-    %waitbar((3000-deviceitr)/3000);
     fprintf('当前训练用户编号为%d\n',deviceitr)
     %取出该当前用户这个月的所有记录
     
@@ -43,7 +43,6 @@ for deviceitr = 1001:1010
         opts = Main_Char_RNN(opts); %训练
         
         %获取输出结果
-
         %对于当天观看记录为0的人，不予预测，将其当天的预测率设置为404
         if(isempty(opts.results.LastTestEpochError))
             del = [del,deviceitr];
@@ -53,21 +52,23 @@ for deviceitr = 1001:1010
             someOutput.recomm{t}(:,dayitr) = rt;  %记录当天推荐准确率（列向量）包括top1~5
             %someOutput.prediction存放每个测试集(区分冷、热频道后)中所有样例的对应每次推荐结果
             someOutput.prediction(t,dayitr) = {1- opts.myOutput.LastMiniBatchError };
+            %someOutput.recommchannel存放每个测试集(区分冷、热频道后)中所有样例的对应每次推荐候选频道结果
+            someOutput.recommchannel(t,dayitr) = {opts.myOutput.LastMiniBatchRecommchannel};
             someOutput.tprediction(t,dayitr) = {opts.myOutput.AllMiniBatchPrediction };
         end
         %someOutput.watchorder存放每个测试集(区分冷、热频道后)中所有样例对应原始序列（完整测试集）的索引
         someOutput.watchorder(t,dayitr) = {opts.myOutput.watchorder};
-        
+        someOutput.datasetorder(t,dayitr) = {opts.myOutput.datasetorder};
     end
     
     %%%%%%%%临时存放训练结果文件%%%%%%%%%%
-    [~,name,~]=fileparts(inputFile);
-    name = strcat(name,'Temp.mat');
-    outputFile=fullfile('C:\Work\IPTV\IPTV Recommendation\Result\',name);
-    if ~exist(outputFile,'file') 
-        save(outputFile,'someOutput');
-    end
-    save(outputFile,'someOutput','-append');
-    save(outputFile,'del','-append');
+%     [~,name,~]=fileparts(inputFile);
+%     name = strcat(name,'Temp.mat');
+%     outputFile=fullfile('C:\Work\IPTV\IPTV Recommendation\Result\',name);
+%     if ~exist(outputFile,'file') 
+%         save(outputFile,'someOutput');
+%     end
+%     save(outputFile,'someOutput','-append');
+%     save(outputFile,'del','-append');
 end
-% close(h);
+close(h);

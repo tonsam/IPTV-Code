@@ -5,8 +5,8 @@ function [opts] = Main_Char_RNN(opts)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %provide parameters and inputs below
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-addpath('../')
-addpath(genpath('../CoreModules'));
+%addpath('../')
+%addpath(genpath('../CoreModules'));
 %addpath('./lm_data');
 
 %n_epoch=opts.n_epoch; %%training epochs
@@ -112,6 +112,11 @@ opts.n_test_batch=floor(opts.n_test/opts.parameters.test_batch_size);%所有数据测
 %     figure1=figure;
 % end
 opts.parameters.current_ep=1;     %start_ep=opts.parameters.current_ep;
+
+if iscell(opts.output_name2)
+    opts.output_name2 = opts.output_name2{:};
+    opts.output_name = opts.output_name{:};
+end
 %开始进行N次epoch训练
 for ep=1:opts.n_epoch
     %%%%%进行一期训练
@@ -125,11 +130,12 @@ for ep=1:opts.n_epoch
     %文件记录每期训练状态及参数
     parameters=opts.parameters;    
     results=opts.results;
+    %matlab会抽筋系列，output_name、output_name2数据类型有时候为cell(解决：opts.output_name2{:}循环外面)、有时候为字符串 
     save(fullfile(opts.output_dir2,[opts.output_name2,num2str(ep),'.mat']),'net','parameters','results');
     opts.parameters.current_ep=opts.parameters.current_ep+1; 
 end
 %保存最终训练结果copyfile('source','destination')
-copyfile(fullfile(opts.output_dir2,[opts.output_name2,num2str(ep),'.mat']),fullfile(opts.output_dir,opts.output_name));
+copyfile(fullfile(opts.output_dir2,[opts.output_name2,num2str(ep),'.mat']),fullfile(opts.output_dir,[opts.output_name]));
 
 %%%%%测试模型
 [opts]=test_rnn(net,opts);
