@@ -4,6 +4,7 @@ function [someOutput,del] = totalRnnPredict(rnnpara,inputFile)
 %预测结果存放在someOutput.recomm中，recomm{3}(2,:)表示给用户3推荐2个频道的准确率，以此类推，如若该天用户未观看电视级即无预测结果，以404表示。
 %someOutput.watchorder存放每个测试集(区分冷、热频道后)中所有样例对应原始序列（完整测试集）的索引
 %someOutput.prediction存放每个测试集(区分冷、热频道后)中所有样例的对应每次推荐结果
+%someOutput.datasetorder存放每个测试集原始频道观看序列
 %为防止程序意外停止，每天的预测结果会存放在当前目录下result文件夹内
 %%%%%%%%%%%%%%%%%%%%%
 clear opts;
@@ -43,7 +44,7 @@ for deviceitr = rnnpara.UserIDBegin:rnnpara.UserIDEnd
         opts = Main_Char_RNN(opts); %训练
         
         %获取输出结果
-        %对于当天观看记录为0的人，不予预测，将其当天的预测率设置为404
+        %对于当天观看记录不足的人，不予预测，将其当天的预测率设置为404
         if(isempty(opts.results.LastTestEpochError))
             del = [del,deviceitr];
             someOutput.recomm{t}(:,dayitr) = 404; %当天不予推荐
@@ -55,12 +56,12 @@ for deviceitr = rnnpara.UserIDBegin:rnnpara.UserIDEnd
             %someOutput.recommchannel存放每个测试集(区分冷、热频道后)中所有样例的对应每次推荐候选频道结果
             someOutput.recommchannel(t,dayitr) = {opts.myOutput.LastMiniBatchRecommchannel};
             someOutput.tprediction(t,dayitr) = {opts.myOutput.AllMiniBatchPrediction };
+            %someOutput.watchorder存放每个测试集(区分冷、热频道后)中所有样例对应原始序列（完整测试集）的索引
+            someOutput.watchorder(t,dayitr) = {opts.myOutput.watchorder};
+            someOutput.datasetorder(t,dayitr) = {opts.myOutput.datasetorder};
         end
-        %someOutput.watchorder存放每个测试集(区分冷、热频道后)中所有样例对应原始序列（完整测试集）的索引
-        someOutput.watchorder(t,dayitr) = {opts.myOutput.watchorder};
-        someOutput.datasetorder(t,dayitr) = {opts.myOutput.datasetorder};
     end
-    
+   
     %%%%%%%%临时存放训练结果文件%%%%%%%%%%
 %     [~,name,~]=fileparts(inputFile);
 %     name = strcat(name,'Temp.mat');
