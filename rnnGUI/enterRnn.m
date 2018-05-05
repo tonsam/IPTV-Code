@@ -36,7 +36,7 @@ for  i = 3:fileNum
         
         [~,name,~]=fileparts(inputFile);
         %name = strcat(name,'ChannelType',num2str(rnnpara.channeltype),'by',num2str(rnnpara.channelFreqPercent),'%Recomm.mat');
-        name = strcat(name,'tempGUIVersion2.mat');
+        name = strcat(name,'temp',num2str(rnnpara.UserIDBegin),'-',num2str(rnnpara.UserIDEnd ),'.mat');
         outputFile=fullfile(outputDir,name);
         
         myGUIdata.inputFile = inputFile;

@@ -1,15 +1,18 @@
 function [SingleDayResult] = getSDR(recommchannel,watchorder,datasetorder,prediction,sqlength)
-%GETRCL 获取该用户该天的各种结果信息
+%获取该用户该天的各种结果信息
 %watchorder 样例频道对应原始序列的索引
-SingleDayResult.datasetorder = datasetorder;%列向量转行向量
+SingleDayResult.datasetorder = datasetorder;
 SingleDayResult.TotalChanNum = size(SingleDayResult.datasetorder,1); %观看总频道数
 SingleDayResult.RecommChanNum = size(prediction,2);%推荐频道（次）数
 SingleDayResult.AcceptedChanNum =  sum(prediction,2);% 推荐接受的频道（次）数 （5行1列）
 
-%五个候选频道序列（还原到原始观看序列长度以作对比）
-SingleDayResult.recommchannel= zeros(5,SingleDayResult.TotalChanNum );
+%五个候选频道序列（还原到原始观看序列以作对比）
+SingleDayResult.recommchannel = zeros(5,SingleDayResult.TotalChanNum );
+SingleDayResult.prediction = zeros(5,SingleDayResult.TotalChanNum ); %正确错误曲线数据
+SingleDayResult.prediction(:,:) = -1;%-1表示未发生推荐，0表示推荐错误，1表示推荐正确
 for i = sqlength:size(watchorder,2)  %第一个推荐频道为第sqlength个
     SingleDayResult.recommchannel(:,watchorder(i)) = recommchannel(:,i-sqlength+1);
+    SingleDayResult.prediction(:,watchorder(i)) = prediction(:,i-sqlength+1);
 end
 %未发生推荐的设置为空
 for i = 1:size(SingleDayResult.recommchannel,2)
@@ -17,7 +20,9 @@ for i = 1:size(SingleDayResult.recommchannel,2)
         SingleDayResult.recommchannel(:,i) = NaN;
     end
 end
+%为了绘图，转换成5列向量矩阵
 SingleDayResult.recommchannel = SingleDayResult.recommchannel';
+SingleDayResult.prediction = SingleDayResult.prediction';
 
 %计算TopN对应的acc与recall
 SingleDayResult.acc =SingleDayResult.AcceptedChanNum / SingleDayResult.RecommChanNum;
