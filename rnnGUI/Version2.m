@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%主函数入口%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function varargout = Version2(varargin)
 %VERSION1 MATLAB code file for Version1.fig
-% Last Modified by GUIDE v2.5 04-May-2018 15:22:49
+% Last Modified by GUIDE v2.5 30-Jun-2018 17:49:33
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
@@ -93,6 +93,7 @@ handles.consoleInfo = [handles.consoleInfo,tstr];
 set(handles.text_ConsoleInfo,'String',handles.consoleInfo);
 set(handles.edit_outputFile,'String',myGUIdata.outputFile);
 %相关联控件操作
+set(handles.ShowAllResult_button,'Enable','On');
 set(handles.ShowUserResult_button,'Enable','On');
 set(handles.ShowDayResult_button,'Enable','off');
 
@@ -111,10 +112,38 @@ tstr = ['   ',datestr(now),'  已加载指定文件数据',num2str(myGUIdata.UserIDBegin)
 handles.consoleInfo = [handles.consoleInfo,tstr];
 set(handles.text_ConsoleInfo,'String',handles.consoleInfo);
 %相关联控件操作
+set(handles.button_Magic,'Enable','On');
+set(handles.ShowAllResult_button,'Enable','On');
 set(handles.ShowUserResult_button,'Enable','On');
 set(handles.ShowDayResult_button,'Enable','off');
 
 guidata(hObject,handles);
+%加载数据后可定制的任务按钮
+function button_Magic_Callback(hObject, eventdata, handles)
+%加载数据
+load(handles.myGUIdata.outputFile);
+%冷热区分训练DL中延时推荐，统计延时跳数
+someOutput1.datasetorder = someOutput.datasetorder;
+someOutput1.watchorder = someOutput.watchorder;
+someOutput1.prediction = someOutput.prediction;
+%按用户编号排序的冷、热序列的延时跳数DelayStep以及推荐命中延时跳数.RecommDelayStep
+AnsDelayStep = getDelayStep(someOutput1,myGUIdata.seqlength);
+%按延时跳数排序以及CDF分布
+CDF.DelayStep =  getCDF(AnsDelayStep.DelayStep );
+CDF.DelayStepTOP1 =  getCDF(AnsDelayStep.RecommDelayStep(1,:)' );
+CDF.DelayStepTOP2 =  getCDF(AnsDelayStep.RecommDelayStep(2,:)' );
+CDF.DelayStepTOP3 =  getCDF(AnsDelayStep.RecommDelayStep(3,:)' );
+CDF.DelayStepTOP4 =  getCDF(AnsDelayStep.RecommDelayStep(4,:)' );
+CDF.DelayStepTOP5 =  getCDF(AnsDelayStep.RecommDelayStep(5,:)' );
+
+save(handles.myGUIdata.outputFile,'AnsDelayStep','-append');
+save(handles.myGUIdata.outputFile,'CDF','-append');
+
+tstr = ['   ',datestr(now),'  Magic Mission Completed!']; 
+handles.consoleInfo = [handles.consoleInfo,tstr];
+set(handles.text_ConsoleInfo,'String',handles.consoleInfo);
+
+
 
 %inputDir默认值设置C:\Work\IPTV\IPTV Recommendation\dataset\
 function edit_inputDir_Callback(hObject, eventdata, handles)
@@ -128,11 +157,11 @@ outputDir =get(hObject,'String');
 if (isempty(outputDir))
     set(hObject,'String','C:\Work\IPTV\IPTV Recommendation\Result\');
 end   
-%OnputFile默认值设置C:\Work\IPTV\IPTV Recommendation\Result\Trainingset3000WithDuration[10-3600]tempGUI.mat
+%OnputFile默认值设置C:\Work\IPTV\IPTV Recommendation\Result\Trainingset3000WithDuration[10-3600]temp1001-1050.mat
 function edit_outputFile_Callback(hObject, eventdata, handles)
 temp=get(hObject,'String');
 if (isempty(temp))
-    set(hObject,'String','C:\Work\IPTV\IPTV Recommendation\Result\Trainingset3000WithDuration[10-3600]tempGUI.mat');
+    set(hObject,'String','C:\Work\IPTV\IPTV Recommendation\Result\Trainingset3000WithDuration[10-3600]temp1001-1050.mat.mat');
 end   
 %UserIDBegin起始用户编号1
 function edit_UserIDBegin_Callback(hObject, eventdata, handles)
@@ -210,7 +239,8 @@ function ShowAllResult_button_Callback(hObject, eventdata, handles)
 load(handles.myGUIdata.outputFile);
 if ~exist('AllResult') %如果不存在变量
     %逐个用户计算统计结果
-    i = 0;
+    i = 0; 
+    invalid=0;%无效用户（当数据量过小，该用户不发生推荐，无推荐结果）
     AllResult.Averacc = zeros(5,myGUIdata.UserIDEnd-myGUIdata.UserIDBegin+1 ); 
     AllResult.Averrecall = zeros(5,myGUIdata.UserIDEnd-myGUIdata.UserIDBegin+1 ); 
     AllResult.Totalacc = zeros(5,myGUIdata.UserIDEnd-myGUIdata.UserIDBegin+1 ); 
@@ -222,7 +252,7 @@ if ~exist('AllResult') %如果不存在变量
     for  UserID = myGUIdata.UserIDBegin :myGUIdata.UserIDEnd
         i = i+1;
         %获取原始输出数据
-        recomm5 = someOutput.recomm{1,i};
+        recomm5 = someOutput.recomm{1,i};%第i个用户的所有测试天数准确率
         datasetorder = someOutput.datasetorder(i,:);
         prediction = someOutput.prediction(i,:);
         %计算第i个用户的结果
@@ -232,21 +262,24 @@ if ~exist('AllResult') %如果不存在变量
         AllResult.Averrecall(:,i) = ValidSUR.Averrecall;
         AllResult.Totalacc(:,i) = ValidSUR.Totalacc;
         AllResult.Totalrecall(:,i) = ValidSUR.Totalrecall;
+        if isnan(AllResult.Averacc(1,i)) %当前用户无推荐结果
+            invalid =  invalid + 1;
+            continue;
+        end
         %统计所有用户的总指标
         AllResult.AllAveracc = AllResult.AllAveracc+ValidSUR.Averacc;
         AllResult.AllAverrecall = AllResult.AllAverrecall+ValidSUR.Averrecall;
         AllResult.AllTotalacc= AllResult.AllTotalacc+ValidSUR.Totalacc;
         AllResult.AllTotalrecall = AllResult.AllTotalrecall+ValidSUR.Totalrecall;
-
     end
     %总指标取平均
-     AllResult.AllAveracc = AllResult.AllAveracc/i;
-     AllResult.AllAverrecall = AllResult.AllAverrecall/i;
-     AllResult.AllTotalacc= AllResult.AllTotalacc/i;
-     AllResult.AllTotalrecall = AllResult.AllTotalrecall/i;
-     save(handles.myGUIdata.outputFile,'AllResult','-append');
+    i = i-invalid;
+    AllResult.AllAveracc = AllResult.AllAveracc/i;
+    AllResult.AllAverrecall = AllResult.AllAverrecall/i;
+    AllResult.AllTotalacc= AllResult.AllTotalacc/i;
+    AllResult.AllTotalrecall = AllResult.AllTotalrecall/i;
+    save(handles.myGUIdata.outputFile,'AllResult','-append');
 end
-
  
 %---1.显示以下操作图像在axes4控件中
 axes(handles.axes4);
@@ -412,7 +445,7 @@ axes(handles.axes7);cla;
 SingleUserResult.SingleDayResult.predictionLine = plot(SingleUserResult.SingleDayResult.prediction ,'-x');
 title(['用户',num2str(SingleUserResult.ResultUserID),'在第',num2str(SingleUserResult.ResultDayID ),'天预测推荐频道命中曲线图'])%设置图像标题
 xlabel('第x个观看频道') %设置x轴标题
-ylabel('（-1，0，1）对应（未推荐，命中，未命中）') %设置y轴标题
+ylabel('（-1，0，1）对应（未推荐，未命中，命中）') %设置y轴标题
 set(gca,'XTick',[1:1:1000]) %设置x轴坐标显示范围，间隔为1
 set(gca,'YTick',[-2:1:2]); %设置y轴坐标显示范围，间隔为5
 legend( '候选频道TOP1','候选频道TOP2','候选频道TOP3','候选频道TOP4','候选频道TOP5');%设置图例
@@ -567,3 +600,5 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%▲综上%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+

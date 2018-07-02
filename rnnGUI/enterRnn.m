@@ -13,7 +13,11 @@ rnnpara.batch_size = myGUIdata.batch_size;  %训练时batch_size大小5，不可过大
 rnnpara.UserIDBegin = myGUIdata.UserIDBegin; 
 rnnpara.UserIDEnd = myGUIdata.UserIDEnd;
 rnnpara.channeltype = myGUIdata.channeltype; %训练频道类型，0,不区分，1.冷 2.热
-rnnpara.channelFreqPercent = myGUIdata.channelFreqPercent; %频道划分频率百分比
+if rnnpara.channeltype 
+    rnnpara.channelFreqPercent = myGUIdata.channelFreqPercent; %频道划分频率百分比
+else
+    rnnpara.channelFreqPercent = 0;%混合则不区分划分频率
+end
 rnnpara.n_hidden_nodes = myGUIdata.n_hidden_nodes; %网络隐藏层 30
 
 rnnpara.startday = 1;   %第一个训练窗口起始日期，第一次训练为1~window号，window+1号作为第一次测试日期
@@ -33,10 +37,10 @@ for  i = 3:fileNum
         [someOutput,~] = totalRnnPredict(rnnpara,inputFile);
         time5 = num2str(etime(clock,t1));
         %%%%%%%%%%运行结果输出%%%%%%%%%%
-        
         [~,name,~]=fileparts(inputFile);
-        %name = strcat(name,'ChannelType',num2str(rnnpara.channeltype),'by',num2str(rnnpara.channelFreqPercent),'%Recomm.mat');
-        name = strcat(name,'temp',num2str(rnnpara.UserIDBegin),'-',num2str(rnnpara.UserIDEnd ),'.mat');
+        name = strcat(name,'U[',num2str(rnnpara.UserIDBegin),'-',num2str(rnnpara.UserIDEnd ),']',...
+                         'Type',num2str(rnnpara.channeltype ),'by',num2str(rnnpara.channelFreqPercent),'%',...
+                         '[',date,'].mat');
         outputFile=fullfile(outputDir,name);
         
         myGUIdata.inputFile = inputFile;

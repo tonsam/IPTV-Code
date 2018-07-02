@@ -27,4 +27,15 @@ else
     err(5,1)=sum(min(error(1:end,:),[],1)) ;
 end
 %返回具体推荐了那些频道（暂为映射后编号）
-recommchannel =  predictions(1:5);
+
+if size( predictions,1)>=5 %可选频道多于五个
+    recommchannel =  predictions(1:5);
+else
+    %可选频道少于五个
+    recommchannel = predictions(1:size( predictions,1));
+    for i = size( predictions,1)+1: 5 %后续推荐相同的频道
+         recommchannel(i) = predictions(size( predictions,1));
+    end
+end
+
+    
