@@ -1,0 +1,11 @@
+2018.3.5
+DeepLearnToolbox为bp的实现代码，LightNet-master为lstm的实现代码，matlab里先把这两个文件夹添加到路径里面。
+lstm预测运行入口：rnnPredict/enterRnn.m
+bp预测运行入口：windowPredict/BPNNBinaryEnter.m
+可修改的网络参数我已经在上面这两个文件中注释出来了。
+maatlabdatasetout10.txt为剔除用户观看时长10s，是加载进代码中的数据，
+BPNNS2.m和totalRnnPredict.m里文件加载路径改一下。
+运行中有其他问题再讨论。
+
+
+需要用的原始数据，你倒到mysql里做处理，还有添加下一频道的&去除10s的python代码

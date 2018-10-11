@@ -1,5 +1,8 @@
 /char-tests
 /dataset
-
-*.txt
+/Data/DatasetCode/input
+/Data/DatasetCode/output
+/Data/DatasetCode/data
+/Data/OldData&DataCode/DATA
 *.asv
+*.idea

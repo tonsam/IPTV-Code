@@ -1,0 +1,39 @@
+20160429
+1. Implemented optimizers: SGD, Adagrad, RMSProp, Adam.
+2. LSTM implemented.
+20160501
+1. Q-network implemented.
+20160505
+1. Intermediate network parameters are saved by modifying the TrainScript.
+20160509
+1. Updated LSTM training. 
+2. Experiments are now separated in different folders. A RunAll.m script is provided to run all experiments at once.
+20160511
+1.Simplified implementation of loss functions.
+20160517
+1.A small fix in the tanh function.
+2.A small fix in the train_lstm function to make it compatible with older matlab release.
+20160528
+1. Pretrained ImageNet models are supported.
+2. Local response normalization added.
+3. Batch normalization added.
+20160604
+1. A small fix in the RNN training procedure.
+20160606
+1. A small fix in the RNN training procedure to make it compatible with older matlab Matlab versions.
+2. A severe bug in the convolutional layer introduced in the 20160528 version is fixed.
+20160609
+1. Convolutions using CUDNN is supported.
+20160610
+1. A small fix in the LSTM loss.
+20160624
+1. A small fix in the LSTM bp process.
+2. A small fix in the bnorm function.
+20160707
+1. A fix in the tanh_ln implementation.
+2. A fix in the LSTM inplementation.
+20160920
+1. Dropout layer added.
+20161010
+1. RNN network with skip links added in the RNN folder.
+2. Gated Recurrent Unit added in the RNN folder.

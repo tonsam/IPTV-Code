@@ -1,0 +1,25 @@
+
+https://www.zhihu.com/question/46688107
+尝试从协同过滤等角度切入推荐算法模型
+1.论文的选取：SCI、相关性、时新性、影响力
+2.MovieLens数据集的推荐延时？
+3.推荐领域的延时指标？
+
+
+前端用户层面：点击率：推荐的内容被点击的次数/推荐内容的展示次数，越高越好
+Collaborative Filtering Recommender Systems-Michael D. Ekstrand-2011
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
